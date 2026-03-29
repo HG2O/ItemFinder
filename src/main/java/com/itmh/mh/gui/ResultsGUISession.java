@@ -1,6 +1,6 @@
-package com.itmh.dragon.gui;
+package com.itmh.mh.gui;
 
-import com.itmh.dragon.model.ItemSearchResult;
+import com.itmh.mh.model.ItemSearchResult;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

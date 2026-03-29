@@ -1,6 +1,6 @@
-package com.itmh.dragon.listener;
+package com.itmh.mh.listener;
 
-import com.itmh.dragon.ItemFinderPlugin;
+import com.itmh.mh.ItemFinderPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

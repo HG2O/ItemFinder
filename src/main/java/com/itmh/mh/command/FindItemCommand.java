@@ -1,11 +1,10 @@
-package com.itmh.dragon.command;
+package com.itmh.mh.command;
 
-import com.itmh.dragon.ItemFinderPlugin;
-import com.itmh.dragon.gui.ResultsGUI;
-import com.itmh.dragon.model.ItemSearchResult;
-import com.itmh.dragon.search.SearchEngine;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import com.itmh.mh.ItemFinderPlugin;
+import com.itmh.mh.gui.ResultsGUI;
+import com.itmh.mh.model.ItemSearchResult;
+import com.itmh.mh.search.SearchEngine;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,11 +17,9 @@ import java.util.List;
 public class FindItemCommand implements CommandExecutor, TabCompleter {
 
     private final ItemFinderPlugin plugin;
-    private final SearchEngine searchEngine;
 
     public FindItemCommand(ItemFinderPlugin plugin) {
         this.plugin = plugin;
-        this.searchEngine = new SearchEngine(plugin);
     }
 
     @Override
@@ -34,41 +31,54 @@ public class FindItemCommand implements CommandExecutor, TabCompleter {
         }
 
         if (!player.hasPermission("itemfinder.use")) {
-            player.sendMessage(Component.text("❌ Tu n'as pas la permission d'utiliser cette commande.", NamedTextColor.RED));
+            player.sendMessage(ChatColor.RED + "❌ Tu n'as pas la permission d'utiliser cette commande.");
             return true;
         }
 
         if (args.length == 0) {
-            player.sendMessage(Component.text("Usage : /finditem <nom ou matériau>", NamedTextColor.YELLOW));
+            player.sendMessage(ChatColor.YELLOW + "Usage : /finditem <nom ou matériau>");
             return true;
         }
 
+        // ── Cooldown ──
+        if (plugin.getCooldownManager().isOnCooldown(player)) {
+            int remaining = plugin.getCooldownManager().getRemainingSeconds(player);
+            player.sendMessage(ChatColor.RED + "⏳ Attends encore " + ChatColor.YELLOW + remaining + "s"
+                    + ChatColor.RED + " avant de relancer une recherche.");
+            return true;
+        }
+        plugin.getCooldownManager().setCooldown(player);
+
         String query = String.join(" ", args);
+        player.sendMessage(ChatColor.AQUA + "🔍 Recherche de " + ChatColor.WHITE + "\"" + query + "\""
+                + ChatColor.AQUA + " en cours...");
 
-        player.sendMessage(Component.text("🔍 Recherche de ", NamedTextColor.AQUA)
-                .append(Component.text("\"" + query + "\"", NamedTextColor.WHITE))
-                .append(Component.text(" en cours...", NamedTextColor.AQUA)));
+        runSearch(plugin, player, query);
+        return true;
+    }
 
-        // Recherche asynchrone pour ne pas freezer le serveur
+    /**
+     * Lance une recherche complète.
+     * Doit être appelé depuis le main thread (collecte des snapshots).
+     * Réutilisé par le bouton Refresh de la GUI.
+     */
+    public static void runSearch(ItemFinderPlugin plugin, Player player, String query) {
+        List<SearchEngine.InventorySnapshot> snapshots = plugin.getSearchEngine().collectSnapshots();
+
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            List<ItemSearchResult> results = searchEngine.search(query);
+            List<ItemSearchResult> results = plugin.getSearchEngine().search(snapshots, query);
 
-            // Retour sur le thread principal pour ouvrir l'inventaire
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 if (results.isEmpty()) {
-                    player.sendMessage(Component.text("❌ Aucun item trouvé pour ", NamedTextColor.RED)
-                            .append(Component.text("\"" + query + "\"", NamedTextColor.WHITE)));
+                    player.sendMessage(ChatColor.RED + "❌ Aucun item trouvé pour "
+                            + ChatColor.WHITE + "\"" + query + "\"");
                     return;
                 }
-
-                player.sendMessage(Component.text("✅ ", NamedTextColor.GREEN)
-                        .append(Component.text(results.size() + " résultat(s) trouvé(s) !", NamedTextColor.WHITE)));
-
+                player.sendMessage(ChatColor.GREEN + "✅ " + ChatColor.WHITE
+                        + results.size() + " résultat(s) trouvé(s) !");
                 ResultsGUI.open(player, results, query, 0);
             });
         });
-
-        return true;
     }
 
     @Override

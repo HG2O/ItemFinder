@@ -1,0 +1,77 @@
+# ╔══════════════════════════════════════╗
+# ║         ItemFinder - Config          ║
+# ║           by HG2O                    ║
+# ╚══════════════════════════════════════╝
+
+# ──────────────────────────────────────
+# PARAMÈTRES GÉNÉRAUX
+# ──────────────────────────────────────
+
+# Délai max de recherche en secondes
+search-timeout: 30
+
+# Scanner les chunks non chargés (plus lent mais plus complet)
+scan-unloaded-chunks: false
+
+# ──────────────────────────────────────
+# MESSAGES
+# Supporte les codes couleurs : &a &b &c &d &e &f &0-9
+# Supporte &l (gras), &o (italique), &n (souligné), &r (reset)
+# Variables disponibles : %player%, %query%, %count%
+# ──────────────────────────────────────
+
+messages:
+  # Préfixe affiché devant chaque message
+  prefix: "&8[&b&lItemFinder&8] &r"
+
+  # Aucune permission
+  no-permission: "%prefix%&cTu n'as pas la permission d'utiliser cette commande."
+
+  # Mauvaise utilisation de la commande
+  usage: "%prefix%&eUsage : &f/finditem <nom ou matériau>"
+
+  # Recherche en cours
+  searching: "%prefix%&bRecherche de &f\"%query%\"&b en cours..."
+
+  # Aucun résultat
+  no-results: "%prefix%&cAucun item trouvé pour &f\"%query%\"&c."
+
+  # Résultats trouvés
+  results-found: "%prefix%&a%count% résultat(s) trouvé(s) !"
+
+  # Commande réservée aux joueurs
+  player-only: "%prefix%&cCette commande est réservée aux joueurs."
+
+# ──────────────────────────────────────
+# GUI (Simple)
+# ──────────────────────────────────────
+
+gui:
+  # Titre de la fenêtre de résultats
+  title: "&b&lRecherche &8: &f\"%query%\" &8— &7%count% résultat(s)"
+
+  # Texte du bouton page précédente
+  prev-page: "&a◀ Page précédente"
+
+  # Texte du bouton page suivante
+  next-page: "&aPage suivante ▶"
+
+  # Texte de l'info centrale
+  page-info: "&ePage %page% / %total%"
+
+
+# ── Cooldown entre deux recherches (secondes). 0 = désactivé ──
+cooldown-seconds: 5
+
+# ── Mondes exclus du scan (laisser vide = tous les mondes) ──
+disabled-worlds:
+#  - world_nether
+#  - world_the_end
+
+# ── Items déclenchant une alerte admin ──
+alert-items: []
+#  - TNT
+#  - BEDROCK
+
+# ── Intervalle de vérification des alertes (secondes) ──
+alert-interval-seconds: 60

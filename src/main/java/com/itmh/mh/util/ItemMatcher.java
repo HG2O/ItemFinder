@@ -1,4 +1,4 @@
-package com.itmh.dragon.util;
+package com.itmh.mh.util;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.enchantments.Enchantment;

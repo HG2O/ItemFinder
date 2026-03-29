@@ -1,0 +1,32 @@
+name: ITMH
+version: 1.0-SNAPSHOT
+main: com.itmh.mh.ItemFinderPlugin
+api-version: 1.21
+
+commands:
+  finditem:
+    description: Trouver un item sur le serveur
+    usage: /finditem <nom ou matériau>
+    permission: itemfinder.use
+  itemstats:
+    description: Afficher les items les plus stockés sur le serveur
+    usage: /itemstats
+    permission: itemfinder.stats
+  itemalert:
+    description: Gérer les alertes d'items interdits
+    usage: /itemalert <add|remove|list> [matériau]
+    permission: itemfinder.alert
+
+permissions:
+  itemfinder.use:
+    description: Permet d'utiliser /finditem
+    default: op
+  itemfinder.stats:
+    description: Permet d'utiliser /itemstats
+    default: op
+  itemfinder.alert:
+    description: Permet de gérer les alertes /itemalert
+    default: op
+  itemfinder.alerts:
+    description: Reçoit les notifications d'alertes items
+    default: op

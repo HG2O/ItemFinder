@@ -1,4 +1,4 @@
-package com.itmh.dragon.model;
+package com.itmh.mh.model;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;

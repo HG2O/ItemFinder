@@ -1,10 +1,8 @@
-package com.itmh.dragon.gui;
+package com.itmh.mh.gui;
 
-import com.itmh.dragon.model.ItemSearchResult;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import com.itmh.mh.model.ItemSearchResult;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -17,20 +15,20 @@ import java.util.List;
 public class ResultsGUI {
 
     private static final int PAGE_SIZE = 45;
+    public static final String GUI_TITLE_MARKER = "Recherche";
 
     public static void open(Player player, List<ItemSearchResult> results, String query, int page) {
         int totalPages = Math.max(1, (int) Math.ceil(results.size() / (double) PAGE_SIZE));
         page = Math.max(0, Math.min(page, totalPages - 1));
 
-        Component title = Component.text("🔍 Recherche : ", NamedTextColor.DARK_AQUA)
-                .append(Component.text("\"" + query + "\"", NamedTextColor.WHITE))
-                .append(Component.text(" — " + results.size() + " résultat(s)", NamedTextColor.GRAY));
+        String title = ChatColor.DARK_AQUA + "🔍 Recherche : "
+                + ChatColor.WHITE + "\"" + query + "\""
+                + ChatColor.GRAY + " — " + results.size() + " résultat(s)";
 
         Inventory gui = Bukkit.createInventory(null, 54, title);
 
         int start = page * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, results.size());
-
+        int end   = Math.min(start + PAGE_SIZE, results.size());
         for (int i = start; i < end; i++) {
             gui.setItem(i - start, buildResultItem(results.get(i), i + 1));
         }
@@ -53,7 +51,6 @@ public class ResultsGUI {
             case SHULKER_BOX       -> "🟪";
             case OTHER_CONTAINER   -> "🗃";
         };
-
         String locationLabel = switch (result.getLocationType()) {
             case PLAYER_INVENTORY  -> "Inventaire";
             case PLAYER_ENDERCHEST -> "Ender Chest";
@@ -63,64 +60,76 @@ public class ResultsGUI {
             case OTHER_CONTAINER   -> "Conteneur";
         };
 
-        meta.displayName(
-                Component.text("#" + index + " ", NamedTextColor.YELLOW)
-                        .append(Component.text(locationIcon + " " + locationLabel, NamedTextColor.AQUA))
-                        .decoration(TextDecoration.ITALIC, false)
-        );
+        meta.setDisplayName(ChatColor.YELLOW + "#" + index + " "
+                + ChatColor.AQUA + locationIcon + " " + locationLabel);
 
-        List<Component> lore = new ArrayList<>(meta.hasLore() && meta.lore() != null ? meta.lore() : List.of());
-        lore.add(Component.empty());
-        lore.add(Component.text("━━━━━━━━━━━━━━━━", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-        lore.add(Component.text("📍 ", NamedTextColor.GRAY)
-                .append(Component.text(result.getOwnerOrCoords(), NamedTextColor.WHITE))
-                .decoration(TextDecoration.ITALIC, false));
-        lore.add(Component.text("🔢 Quantité : ", NamedTextColor.GRAY)
-                .append(Component.text(result.getCount(), NamedTextColor.WHITE))
-                .decoration(TextDecoration.ITALIC, false));
+        List<String> lore = new ArrayList<>(meta.hasLore() && meta.getLore() != null
+                ? meta.getLore() : List.of());
+
+        lore.add("");
+        lore.add(ChatColor.DARK_GRAY + "━━━━━━━━━━━━━━━━");
+        lore.add(ChatColor.GRAY + "📍 " + ChatColor.WHITE + result.getOwnerOrCoords());
+        lore.add(ChatColor.GRAY + "🔢 Quantité : " + ChatColor.WHITE + result.getCount());
 
         if (result.getLocation() != null) {
-            lore.add(Component.text("🌍 Monde : ", NamedTextColor.GRAY)
-                    .append(Component.text(result.getLocation().getWorld().getName(), NamedTextColor.WHITE))
-                    .decoration(TextDecoration.ITALIC, false));
+            lore.add(ChatColor.GRAY + "🌍 Monde : " + ChatColor.WHITE
+                    + result.getLocation().getWorld().getName());
+            // Indication de clic pour les containers
+            if (result.getLocationType() != ItemSearchResult.LocationType.PLAYER_INVENTORY
+                    && result.getLocationType() != ItemSearchResult.LocationType.PLAYER_ENDERCHEST) {
+                lore.add("");
+                lore.add(ChatColor.DARK_AQUA + "▶ Clic pour les coordonnées dans le chat");
+            }
         }
 
-        meta.lore(lore);
+        meta.setLore(lore);
         display.setItemMeta(meta);
         return display;
     }
 
     private static void fillNavigationBar(Inventory gui, int page, int totalPages, String query, int total) {
+        // Séparateurs
         ItemStack separator = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta sepMeta = separator.getItemMeta();
-        sepMeta.displayName(Component.text(" ").decoration(TextDecoration.ITALIC, false));
+        sepMeta.setDisplayName(" ");
         separator.setItemMeta(sepMeta);
         for (int i = 45; i < 54; i++) gui.setItem(i, separator);
 
+        // ◀ Page précédente (slot 45)
         if (page > 0) {
             ItemStack prev = new ItemStack(Material.ARROW);
             ItemMeta prevMeta = prev.getItemMeta();
-            prevMeta.displayName(Component.text("◀ Page précédente", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-            prevMeta.lore(List.of(Component.text("Page " + page + "/" + totalPages, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+            prevMeta.setDisplayName(ChatColor.GREEN + "◀ Page précédente");
+            prevMeta.setLore(List.of(ChatColor.GRAY + "Page " + page + "/" + totalPages));
             prev.setItemMeta(prevMeta);
             gui.setItem(45, prev);
         }
 
+        // 🔄 Refresh (slot 47)
+        ItemStack refresh = new ItemStack(Material.CLOCK);
+        ItemMeta refreshMeta = refresh.getItemMeta();
+        refreshMeta.setDisplayName(ChatColor.YELLOW + "🔄 Actualiser");
+        refreshMeta.setLore(List.of(ChatColor.GRAY + "Relancer la recherche"));
+        refresh.setItemMeta(refreshMeta);
+        gui.setItem(47, refresh);
+
+        // Page info (slot 49)
         ItemStack info = new ItemStack(Material.PAPER);
         ItemMeta infoMeta = info.getItemMeta();
-        infoMeta.displayName(Component.text("Page " + (page + 1) + " / " + totalPages, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-        infoMeta.lore(List.of(
-                Component.text(total + " résultat(s)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                Component.text("Recherche : \"" + query + "\"", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
+        infoMeta.setDisplayName(ChatColor.YELLOW + "Page " + (page + 1) + " / " + totalPages);
+        infoMeta.setLore(List.of(
+                ChatColor.GRAY + String.valueOf(total) + " résultat(s)",
+                ChatColor.DARK_GRAY + "Recherche : \"" + query + "\""
         ));
         info.setItemMeta(infoMeta);
         gui.setItem(49, info);
 
+        // Page suivante ▶ (slot 53)
         if (page < totalPages - 1) {
             ItemStack next = new ItemStack(Material.ARROW);
             ItemMeta nextMeta = next.getItemMeta();
-            nextMeta.displayName(Component.text("Page suivante ▶", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-            nextMeta.lore(List.of(Component.text("Page " + (page + 2) + "/" + totalPages, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+            nextMeta.setDisplayName(ChatColor.GREEN + "Page suivante ▶");
+            nextMeta.setLore(List.of(ChatColor.GRAY + "Page " + (page + 2) + "/" + totalPages));
             next.setItemMeta(nextMeta);
             gui.setItem(53, next);
         }
