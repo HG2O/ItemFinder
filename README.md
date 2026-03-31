@@ -1,5 +1,5 @@
 # 🔍 ItemFinder
-> Plugin Leaves pour rechercher un item partout sur ta map Minecraft.
+> Plugin Spigot pour rechercher un item partout sur ta map Minecraft.
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21.4-brightgreen?style=flat-square&logo=minecraft)
 ![Leaves](https://img.shields.io/badge/Leaves-Compatible-green?style=flat-square)
@@ -10,7 +10,7 @@
 
 ## 📖 Description
 
-**ItemFinder** est un plugin léger et performant pour serveurs **Leaves 1.21.4** qui permet aux administrateurs de localiser n'importe quel item sur toute la map en une seule commande.
+**ItemFinder** est un plugin léger et performant pour serveurs **Spigot/Paper/Leaves** qui permet aux administrateurs de localiser n'importe quel item sur toute la map en une seule commande.
 
 - 🎒 Recherche dans les inventaires des joueurs en ligne
 - 🟣 Recherche dans les ender chests (joueurs en ligne **et hors-ligne**)
@@ -111,7 +111,7 @@ Le `.jar` compilé se trouve dans `target/ItemFinder-1.0-SNAPSHOT.jar`.
 ```xml
 <dependency>
     <groupId>org.leavesmc.leaves</groupId>
-    <artifactId>leaves-api</artifactId>
+    <artifactId>spigot-api</artifactId>
     <version>1.21.4-R0.1-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
@@ -126,7 +126,7 @@ Le `.jar` compilé se trouve dans `target/ItemFinder-1.0-SNAPSHOT.jar`.
 | Leaves 1.21.4 | ✅ Oui |
 | Paper 1.21.4 | ✅ Oui |
 | Folia | ✅ Oui |
-| Spigot / Bukkit | ⚠️ Non recommandé |
+| Spigot / Bukkit | ✅ Oui |
 
 ---
 
